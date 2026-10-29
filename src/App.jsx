@@ -6,6 +6,8 @@ import { useReducedMotion, MOBILE_QUERY, DESKTOP_QUERY, REDUCED_QUERY } from './
 import { Stage } from './scene/Stage'
 import { Chrome, Site } from './components/Site'
 import { buildSite, playFall } from './choreo/timelines'
+import { CartProvider } from './shop/cart'
+import { ShopOverlays } from './shop/Shop'
 
 /**
  * Waits for the five GLBs, shows a tiny % counter in the wordmark slot,
@@ -61,11 +63,14 @@ export default function App() {
   const reduced = useReducedMotion()
   return (
     <LenisProvider enabled={!reduced}>
-      {/* Layers: back shoes → page type → front shoes → fixed interface */}
-      <Stage reduced={reduced} />
-      <Site />
-      <Chrome />
-      <Orchestrator />
+      <CartProvider>
+        {/* Layers: back shoes → page type → front shoes → fixed interface → shop overlays */}
+        <Stage reduced={reduced} />
+        <Site />
+        <Chrome />
+        <ShopOverlays />
+        <Orchestrator />
+      </CartProvider>
     </LenisProvider>
   )
 }

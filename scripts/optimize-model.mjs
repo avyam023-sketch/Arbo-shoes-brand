@@ -1,12 +1,11 @@
 /**
  * Optimise a Higgsfield (Tripo H3.1) shoe for the web:
  *   node scripts/optimize-model.mjs [src.glb] [out.glb] [textureSize] [simplifyRatio]
- *   npm run optimize:model            → boot (2048px textures)
- *   npm run optimize:models           → boot + the four supporting shoes
- *   npm run optimize:models:mobile    → phone set (1K textures, ~40% triangles)
+ *   npm run optimize:models           → the five shoes (2048px textures, 6% of ~1.4M raw triangles)
+ *   npm run optimize:models:mobile    → phone set (1K textures, 2.5% triangles)
  *
  * - textures: 4K JPEG → 2K WebP (colour, ORM, normal)
- * - geometry: weld + Draco (edgebreaker)
+ * - geometry: weld + meshopt simplify + Draco (edgebreaker)
  */
 import { NodeIO } from '@gltf-transform/core'
 import { ALL_EXTENSIONS, KHRDracoMeshCompression } from '@gltf-transform/extensions'

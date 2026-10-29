@@ -122,7 +122,14 @@ export function buildSite({ isMobile, reduced }) {
 
   /* CONTACT */
   lines($('#contact'), { inStart: 'top 90%', inEnd: 'top 30%', out: false })
-  gsap.fromTo('.contact__para, .footer > *', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, stagger: 0.05, scrollTrigger: { trigger: '#contact', start: 'top 50%', end: 'top 0%', scrub: 1 } })
+  gsap.fromTo('.contact__para', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, scrollTrigger: { trigger: '#contact', start: 'top 50%', end: 'top 0%', scrub: 1 } })
+
+  /* SHOP — title through the mask, then the tiles rise in */
+  const shop = $('#shop')
+  lines(shop, { inStart: 'top 85%', inEnd: 'top 30%', out: false })
+  gsap.fromTo($$('.chapter__num, .chapter__kicker, .shop__intro, .shop__filters', shop), { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, stagger: 0.06, scrollTrigger: { trigger: shop, start: 'top 70%', end: 'top 25%', scrub: 1 } })
+  gsap.fromTo($$('.product', shop), { autoAlpha: 0, y: 60 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, scrollTrigger: { trigger: '.shop__grid', start: 'top 85%', once: true } })
+  gsap.fromTo('.footer > *', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, stagger: 0.05, scrollTrigger: { trigger: '.footer', start: 'top 95%', end: 'top 60%', scrub: 1 } })
 
   /* SHOES — choreography last, so every landmark is measured after the pins */
   const stopChoreo = buildChoreo(buildSpec({ isMobile }), pins)

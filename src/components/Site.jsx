@@ -1,36 +1,15 @@
-import { Fragment, useMemo, useState } from 'react'
-import { SHOES } from '../choreo/shoes'
+import { useMemo, useState } from 'react'
+import { Line, Micro, photo } from './type'
+import { LINKEDIN, PRIVACY, TERMS, WHATSAPP } from './links'
+import { BagButton, Catalog } from '../shop/Shop'
 
 /*
  * All copy on this page is the Rovar Universal website text, verbatim
  * (two typos corrected: "flexbible" → "flexible", "-from" → "— from").
+ * The shop copy (src/shop) is new.
  */
 
-const LINKEDIN = 'https://www.linkedin.com/company/rovar-universal/'
-const WHATSAPP = 'https://wa.me/447440495840'
-const PRIVACY = 'https://rovaruniversal.com/index.php/privacy-policy/'
-const TERMS = 'https://rovaruniversal.com/index.php/terms-and-conditions/'
-const photo = (id) => SHOES.find((s) => s.id === id).photo
-
 /* ─── Small building blocks ─────────────────────────────────────────────── */
-
-/** Big display line. Lines reveal through a mask; `[img:id]` drops an inline photo. */
-function Line({ text, className = '' }) {
-  const parts = text.split(/(\[img:[a-z]+\])/)
-  return (
-    <span className={`line ${className}`}>
-      <span className="line__inner">
-        {parts.map((part, i) => {
-          const m = part.match(/^\[img:([a-z]+)\]$/)
-          return m ? <img key={i} className="inline-photo" src={photo(m[1])} alt="" /> : <Fragment key={i}>{part}</Fragment>
-        })}
-      </span>
-    </span>
-  )
-}
-
-/** Justified uppercase micro-copy column. */
-const Micro = ({ children, className = '' }) => <p className={`micro ${className}`}>{children}</p>
 
 function Barcode({ seed = 7 }) {
   const bars = useMemo(() => {
@@ -108,8 +87,10 @@ export function Chrome() {
       <nav className="chrome__nav" aria-label="Primary">
         <a href="#hero">HOME</a>
         <a href="#ch1">PRODUCTS</a>
+        <a href="#shop">SHOP</a>
         <a href="#about">ABOUT</a>
-        <a href="#contact">CONTACT</a>
+        <a href="#footer">CONTACT</a>
+        <BagButton />
       </nav>
     </div>
   )
@@ -138,11 +119,11 @@ export function Site() {
         <Micro className="hero__para">From concept to production</Micro>
       </section>
 
-      {/* ABOUT — justified caps, the boot tumbles behind it */}
+      {/* ABOUT — justified caps, the hero tumbles behind it */}
       <section className="statement" id="about" aria-label="About">
         <p className="statement__text">
           Rovar Universal is a kids’ footwear manufacturing operation with production based in{' '}
-          <img className="inline-photo" src={photo('boot')} alt="" /> India and commercial presence in the UK.
+          <img className="inline-photo" src={photo('blue')} alt="" /> India and commercial presence in the UK.
         </p>
         <div className="cols cols--3">
           <Micro>
@@ -160,11 +141,11 @@ export function Site() {
         </div>
       </section>
 
-      {/* #01 — PRODUCTS: KIDS' FOOTWEAR (boot) */}
+      {/* #01 — PRODUCTS: KIDS' FOOTWEAR (blue trainer) */}
       <section className="chapter chapter--center" id="ch1" aria-label="Products">
         <p className="chapter__kicker">Products</p>
         <h2 className="display chapter__title">
-          <Line text="KIDS' [img:boot]" />
+          <Line text="KIDS' [img:blue]" />
           <Line text="FOOTWEAR" />
         </h2>
         <div className="cols cols--3 chapter__cols">
@@ -187,14 +168,14 @@ export function Site() {
       </section>
       <Card n={1} title="Classic boots" items={['Pre-walkers', 'First walkers', 'Toddlers', 'Senior children']} />
 
-      {/* #02 — WHY CHOOSE US (sneaker) */}
+      {/* #02 — WHY CHOOSE US (mustard court) */}
       <section className="chapter chapter--left" id="ch2" aria-label="Why choose us">
         <div className="tag">
           <strong>#02</strong>
         </div>
         <h2 className="display chapter__title">
           <Line text="WHY" />
-          <Line text="[img:sneaker] CHOOSE" />
+          <Line text="[img:mustard] CHOOSE" />
           <Line text="US" />
         </h2>
         <p className="shout">
@@ -226,14 +207,14 @@ export function Site() {
         items={['Everyday sneakers', 'Classic boots', 'Boat shoes', 'Sandals', 'Custom school shoes']}
       />
 
-      {/* #03 — marquee (mary jane) */}
+      {/* #03 — marquee (gold terrace) */}
       <section className="chapter chapter--marquee" id="ch3" aria-label="Reliable production capacity and integrated supply network">
         <span className="chapter__num">#03</span>
         <h2 className="marquee">
           <span className="marquee__track display">
             {[0, 1].map((k) => (
               <span key={k} aria-hidden={k === 1}>
-                RELIABLE PRODUCTION CAPACITY <img className="inline-photo" src={photo('maryjane')} alt="" /> INTEGRATED
+                RELIABLE PRODUCTION CAPACITY <img className="inline-photo" src={photo('gold')} alt="" /> INTEGRATED
                 SUPPLY NETWORK
                 <svg className="marquee__sep" viewBox="0 0 10 10" aria-hidden="true">
                   <path d="M1 1 9 9M9 1 1 9" />
@@ -266,13 +247,13 @@ export function Site() {
         items={['Premium leathers', 'Custom colors', 'Specialized insoles', 'Custom outsole trims']}
       />
 
-      {/* #04 — GLOBAL SHIPPING (sandal) */}
+      {/* #04 — GLOBAL SHIPPING (cloud runner) */}
       <section className="chapter chapter--right" id="ch4" aria-label="Global shipping and customized packaging">
         <div className="tag">
           <strong>#04</strong>
         </div>
         <h2 className="display chapter__title">
-          <Line text="GLOBAL [img:sandal]" />
+          <Line text="GLOBAL [img:runner]" />
           <Line text="SHIPPING" />
         </h2>
         <div className="cols cols--2 chapter__cols">
@@ -294,7 +275,7 @@ export function Site() {
       </section>
       <Card n={4} title="Customized packaging" items={['Custom boxes', 'Branding', 'Labelling']} />
 
-      {/* THE ROVAR EXPERIENCE + footer — every shoe falls back in */}
+      {/* THE ROVAR EXPERIENCE — every shoe falls back in, then flies off for the shop */}
       <section className="contact" id="contact" aria-label="The Rovar Experience">
         <h2 className="display contact__title">
           <Line text="THE ROVAR" />
@@ -305,31 +286,35 @@ export function Site() {
           production ecosystem, we deliver premium leather craftsmanship, agile sampling timelines, and reliable long-term
           supply partnerships for global brands.
         </Micro>
-        <footer className="footer">
-          <div>
-            <h3>Connect With Us</h3>
-            <a href={LINKEDIN} target="_blank" rel="noreferrer">
-              Linkedin
-            </a>
-            <a href={WHATSAPP} target="_blank" rel="noreferrer">
-              Whatsapp
-            </a>
-          </div>
-          <div>
-            <h3>Quick Links</h3>
-            <a href={PRIVACY}>Privacy Policy</a>
-            <a href={TERMS}>Terms and Conditions</a>
-          </div>
-          <div>
-            <h3>Subscribe</h3>
-            <p className="micro">Sign up, you’ll love hearing from us. We promise!</p>
-            <Subscribe />
-          </div>
-          <p className="footer__copy">
-            Copyright © 2026 ROVAR UNIVERSAL | <a href={PRIVACY}>PRIVACY POLICY</a>
-          </p>
-        </footer>
       </section>
+
+      {/* SHOP — the catalog, once the shoes have left the stage */}
+      <Catalog />
+
+      <footer className="footer" id="footer">
+        <div>
+          <h3>Connect With Us</h3>
+          <a href={LINKEDIN} target="_blank" rel="noreferrer">
+            Linkedin
+          </a>
+          <a href={WHATSAPP} target="_blank" rel="noreferrer">
+            Whatsapp
+          </a>
+        </div>
+        <div>
+          <h3>Quick Links</h3>
+          <a href={PRIVACY}>Privacy Policy</a>
+          <a href={TERMS}>Terms and Conditions</a>
+        </div>
+        <div>
+          <h3>Subscribe</h3>
+          <p className="micro">Sign up, you’ll love hearing from us. We promise!</p>
+          <Subscribe />
+        </div>
+        <p className="footer__copy">
+          Copyright © 2026 ROVAR UNIVERSAL | <a href={PRIVACY}>PRIVACY POLICY</a>
+        </p>
+      </footer>
     </main>
   )
 }

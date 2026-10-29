@@ -67,6 +67,10 @@ img {
   inset: 0;
   pointer-events: none;
 }
+/* R3F turns pointer events back on for its wrapper + canvas: keep the page clickable */
+.stage * {
+  pointer-events: none !important;
+}
 .stage--back {
   z-index: 1;
 }

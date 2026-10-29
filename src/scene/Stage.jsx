@@ -27,7 +27,8 @@ function dress(root) {
       color: src.color,
       roughness: src.roughness,
       roughnessMap: src.roughnessMap ?? null,
-      metalness: src.metalness,
+      // capped: fully metallic leather (the gold pair) mirrors the dark studio and reads black
+      metalness: Math.min(src.metalness, 0.45),
       metalnessMap: src.metalnessMap ?? null,
       aoMap: src.aoMap ?? null,
       normalMap: src.normalMap ?? null,

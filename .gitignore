@@ -9,3 +9,9 @@ assets-src/legacy-v1/
 assets-src/v1-models/
 assets-src/photos/v1/
 assets-src/*.mp4
+# raw Higgsfield exports of the current cast (~45 MB each; optimized copies live in models/)
+assets-src/blue-higgsfield.glb
+assets-src/mustard-higgsfield.glb
+assets-src/gold-higgsfield.glb
+assets-src/runner-higgsfield.glb
+assets-src/wingtip-higgsfield.glb

@@ -1,9 +1,10 @@
 /**
  * The cast. Every shoe is a Higgsfield (Tripo H3.1) GLB, Draco-compressed.
  * `rotation` re-aims each export so its toe points +Z and the sole faces -Y.
+ * The blue trainer is the hero; the slots keep the original choreography.
  */
 /**
- * Phones get a light cast: 1K textures + ~40% triangles (2.5 MB total vs 8 MB),
+ * Phones get a light cast: 1K textures + ~2.5% of the raw triangles,
  * cheaper materials and a lower pixel ratio. Decided once at load.
  */
 export const LITE = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px), (hover: none) and (pointer: coarse)').matches
@@ -11,11 +12,11 @@ const BASE = import.meta.env.BASE_URL // '/' locally, '/rover-universal/' on Git
 const dir = LITE ? `${BASE}models/m` : `${BASE}models`
 
 export const SHOES = [
-  { id: 'boot', url: `${dir}/boot.glb`, photo: `${BASE}photos/boot.webp`, rotation: [0, Math.PI, 0], name: 'Classic Boot' },
-  { id: 'sneaker', url: `${dir}/sneaker.glb`, photo: `${BASE}photos/sneaker.webp`, rotation: [0, Math.PI, 0], name: 'Everyday Sneaker' },
-  { id: 'maryjane', url: `${dir}/maryjane.glb`, photo: `${BASE}photos/maryjane.webp`, rotation: [0, Math.PI, 0], name: 'Mary Jane' },
-  { id: 'sandal', url: `${dir}/sandal.glb`, photo: `${BASE}photos/sandal.webp`, rotation: [0, Math.PI, 0], name: 'Closed Sandal' },
-  { id: 'prewalker', url: `${dir}/prewalker.glb`, photo: `${BASE}photos/prewalker.webp`, rotation: [0, Math.PI, 0], name: 'Pre-walker' },
+  { id: 'blue', url: `${dir}/blue.glb`, photo: `${BASE}photos/blue.webp`, rotation: [0, Math.PI, 0], name: 'Sky Retro Trainer' },
+  { id: 'mustard', url: `${dir}/mustard.glb`, photo: `${BASE}photos/mustard.webp`, rotation: [0, Math.PI, 0], name: 'Mustard Court' },
+  { id: 'gold', url: `${dir}/gold.glb`, photo: `${BASE}photos/gold.webp`, rotation: [0, -Math.PI / 2, 0], name: 'Gold Terrace' }, // exported toe +X
+  { id: 'runner', url: `${dir}/runner.glb`, photo: `${BASE}photos/runner.webp`, rotation: [0, Math.PI / 2, 0], name: 'Cloud Runner' }, // Hunyuan3D export, toe −X
+  { id: 'wingtip', url: `${dir}/wingtip.glb`, photo: `${BASE}photos/wingtip.webp`, rotation: [0, Math.PI, 0], name: 'Tan Wingtip' },
 ]
 
 /**
