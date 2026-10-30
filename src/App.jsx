@@ -8,6 +8,7 @@ import { Chrome, Site } from './components/Site'
 import { buildSite, playFall } from './choreo/timelines'
 import { CartProvider } from './shop/cart'
 import { ShopOverlays } from './shop/Shop'
+import { AuthProvider } from './auth/AuthContext'
 
 /**
  * Waits for the five GLBs, shows a tiny % counter in the wordmark slot,
@@ -46,7 +47,7 @@ function Orchestrator() {
         try {
           stop = buildSite({ isMobile: ctx.conditions.isMobile, reduced: ctx.conditions.reduced })
         } catch (err) {
-          console.error('[rovar] buildSite failed', err)
+          console.error('[arbo] buildSite failed', err)
         }
         return () => stop?.()
       })
@@ -63,14 +64,16 @@ export default function App() {
   const reduced = useReducedMotion()
   return (
     <LenisProvider enabled={!reduced}>
-      <CartProvider>
-        {/* Layers: back shoes → page type → front shoes → fixed interface → shop overlays */}
-        <Stage reduced={reduced} />
-        <Site />
-        <Chrome />
-        <ShopOverlays />
-        <Orchestrator />
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          {/* Layers: back shoes → page type → front shoes → fixed interface → shop overlays & modals */}
+          <Stage reduced={reduced} />
+          <Site />
+          <Chrome />
+          <ShopOverlays />
+          <Orchestrator />
+        </CartProvider>
+      </AuthProvider>
     </LenisProvider>
   )
 }

@@ -27,14 +27,13 @@ function dress(root) {
       color: src.color,
       roughness: src.roughness,
       roughnessMap: src.roughnessMap ?? null,
-      // capped: fully metallic leather (the gold pair) mirrors the dark studio and reads black
       metalness: Math.min(src.metalness, 0.45),
       metalnessMap: src.metalnessMap ?? null,
       aoMap: src.aoMap ?? null,
       normalMap: src.normalMap ?? null,
       normalScale: src.normalScale?.clone(),
-      envMapIntensity: 1.1,
-      ...(LITE ? {} : { clearcoat: 0.15, clearcoatRoughness: 0.6 }),
+      envMapIntensity: 1.4,
+      ...(LITE ? {} : { clearcoat: 0.2, clearcoatRoughness: 0.5 }),
     })
     o.material = m
     src.dispose()
@@ -72,7 +71,6 @@ function ShoeActor({ shoe, layer, index, idle }) {
     const viewW = VIEW_H * (size.width / size.height)
 
     const float = idle ? Math.sin(t * 0.9) * 0.012 : 0
-    // momentum: heavier shoes (bigger on screen) swing more when you scroll fast
     const swing = motion.vel * (0.35 + p.size * 0.5) * (index % 2 ? -1 : 1)
     const tx = p.x * viewW + pointer.x * 0.06 * (index % 2 ? -1 : 1)
     const ty = (p.y + o.dy + float) * VIEW_H + pointer.y * 0.04
@@ -105,20 +103,15 @@ function ShoeActor({ shoe, layer, index, idle }) {
 function Studio() {
   return (
     <Environment resolution={LITE ? 128 : 256} frames={1}>
-      <Lightformer form="rect" intensity={3} color="#ffffff" position={[0, 6, 3]} rotation-x={Math.PI / 2} scale={[10, 4, 1]} />
-      <Lightformer form="rect" intensity={1.6} color="#ffffff" position={[-6, 1, 2]} rotation-y={Math.PI / 2} scale={[5, 3, 1]} />
-      <Lightformer form="rect" intensity={1.2} color="#f2f2f4" position={[6, 0, 2]} rotation-y={-Math.PI / 2} scale={[5, 3, 1]} />
-      <Lightformer form="ring" intensity={1.2} color="#ffffff" position={[0, 2, -6]} scale={3} />
-      <Lightformer form="rect" intensity={0.6} color="#dcdce0" position={[0, -4, 0]} rotation-x={-Math.PI / 2} scale={[10, 10, 1]} />
+      <Lightformer form="rect" intensity={3.5} color="#ffffff" position={[0, 6, 3]} rotation-x={Math.PI / 2} scale={[10, 4, 1]} />
+      <Lightformer form="rect" intensity={2} color="#ffffff" position={[-6, 1, 2]} rotation-y={Math.PI / 2} scale={[5, 3, 1]} />
+      <Lightformer form="rect" intensity={1.5} color="#f2f2f4" position={[6, 0, 2]} rotation-y={-Math.PI / 2} scale={[5, 3, 1]} />
+      <Lightformer form="ring" intensity={1.8} color="#ffffff" position={[0, 2, -6]} scale={3} />
+      <Lightformer form="rect" intensity={0.9} color="#ffffff" position={[0, -4, 0]} rotation-x={-Math.PI / 2} scale={[10, 10, 1]} />
     </Environment>
   )
 }
 
-/**
- * On-demand rendering: a canvas only draws while one of its shoes is on its
- * layer (plus a short tail so damping settles and hidden shoes clear). The
- * idle canvas — usually one of the two — costs nothing.
- */
 function Driver({ layer }) {
   const invalidate = useThree((s) => s.invalidate)
   useEffect(() => {
@@ -148,15 +141,14 @@ function Layer({ layer, idle }) {
           alpha: true,
           powerPreference: LITE ? 'default' : 'high-performance',
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.0,
+          toneMappingExposure: 1.15,
           outputColorSpace: THREE.SRGBColorSpace,
         }}
       >
-        {/* high-contrast studio: strong key, low fill, bright rim for silhouette */}
-        <ambientLight intensity={0.18} />
-        <directionalLight position={[5, 7, 6]} intensity={2.4} />
-        <directionalLight position={[-6, 1, 4]} intensity={0.35} />
-        <directionalLight position={[-3, 4, -6]} intensity={2.2} />
+        <ambientLight intensity={0.45} />
+        <directionalLight position={[5, 8, 6]} intensity={3.2} />
+        <directionalLight position={[-6, 2, 4]} intensity={0.9} />
+        <directionalLight position={[-3, 4, -6]} intensity={2.6} />
         <Driver layer={layer} />
         <Suspense fallback={null}>
           <Studio />
@@ -169,10 +161,6 @@ function Layer({ layer, idle }) {
   )
 }
 
-/**
- * Two transparent canvases sandwich the page type — shoes can pass behind a
- * headline and in front of the next one, like the reference.
- */
 export function Stage({ reduced }) {
   return (
     <>

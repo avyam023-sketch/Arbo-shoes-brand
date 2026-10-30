@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLenis } from '../hooks/useLenis'
 import { Line, Micro } from '../components/type'
-import { WHATSAPP } from '../components/links'
 import { CATEGORIES, PRODUCTS, money, product } from './catalog'
 import { useCart } from './cart'
+import { CheckoutModal } from './CheckoutModal'
+import { AccountModal } from '../auth/AccountModal'
+import { useAuth } from '../auth/AuthContext'
 
 /* ─── Catalog ───────────────────────────────────────────────────────────── */
 
@@ -57,17 +59,17 @@ export function Catalog() {
   const [cat, setCat] = useState('All')
   const items = PRODUCTS.map((p, i) => ({ p, n: i + 1 })).filter(({ p }) => cat === 'All' || p.category === cat)
   return (
-    <section className="shop" id="shop" aria-label="Shop the range">
+    <section className="shop" id="shop" aria-label="Shop the collection">
       <header className="shop__head">
         <span className="chapter__num">#05</span>
-        <p className="chapter__kicker">Shop</p>
+        <p className="chapter__kicker">ONLINE ATELIER</p>
         <h2 className="display shop__title">
           <Line text="THE [img:blue]" />
-          <Line text="RANGE" />
+          <Line text="COLLECTION" />
         </h2>
         <Micro className="shop__intro">
-          Five styles, made in our own production in India. Suede, nylon, metallic and burnished leathers on gum, foam and
-          rubber soles — every pair you see spinning above, ready to order.
+          Five definitive silhouettes crafted with uncompromising geometric architecture. Hand-finished premium leather,
+          custom tooling, and cushioned cupsole foundations — engineered for perpetual motion.
         </Micro>
         <div className="shop__filters" role="group" aria-label="Filter by category">
           {CATEGORIES.map((c) => (
@@ -102,7 +104,6 @@ function Modal({ open, onClose, className, label, children }) {
       ref={ref}
       className={className}
       aria-label={label}
-      // a close event can land after a quick reopen: only sync state if it's really shut
       onClose={() => !ref.current.open && onClose()}
       onClick={(e) => e.target === ref.current && onClose()}
       data-lenis-prevent
@@ -127,7 +128,7 @@ function Qty({ value, onChange, label }) {
 }
 
 function ProductView() {
-  const { viewing, setViewing, add, setBagOpen } = useCart()
+  const { viewing, setViewing, add, setBagOpen, setCheckoutOpen } = useCart()
   const p = viewing && product(viewing)
   const [size, setSize] = useState(null)
   const [qty, setQty] = useState(1)
@@ -148,7 +149,7 @@ function ProductView() {
             <button type="button" className="overlay__close" onClick={close} aria-label="Close">
               ×
             </button>
-            <p className="chapter__kicker">{p.category}</p>
+            <p className="chapter__kicker">{p.category} · ARCHIVE EDITION</p>
             <h2 className="pview__name">{p.name}</h2>
             <p className="pview__price">{money(p.price)}</p>
             <p className="product__colour">
@@ -165,7 +166,11 @@ function ProductView() {
                 </button>
               ))}
             </fieldset>
-            {nudge && <p className="sizes__hint" role="alert">Choose a size first</p>}
+            {nudge && (
+              <p className="sizes__hint" role="alert">
+                Please select a size first
+              </p>
+            )}
 
             <div className="pview__buy">
               <Qty value={qty} onChange={(q) => setQty(Math.max(1, Math.min(9, q)))} label="Quantity" />
@@ -183,6 +188,19 @@ function ProductView() {
               </button>
             </div>
 
+            <button
+              type="button"
+              className="btn btn--ghost pview__instant-checkout"
+              onClick={() => {
+                if (!size) return setNudge(true)
+                add(p.id, size, qty)
+                close()
+                setCheckoutOpen(true)
+              }}
+            >
+              ⚡ Instant 1-Click Checkout
+            </button>
+
             <ul className="pview__details">
               {p.details.map((d) => (
                 <li key={d}>{d}</li>
@@ -195,29 +213,20 @@ function ProductView() {
   )
 }
 
-/**
- * No payment backend yet: checkout hands the order to Rovar on WhatsApp.
- * Swap `checkoutUrl` for a Shopify / Stripe Checkout session when one exists.
- */
-function checkoutUrl(lines, subtotal) {
-  const rows = lines.map((l) => {
-    const p = product(l.id)
-    return `• ${p.name} (${p.colour}) — EU ${l.size} × ${l.qty} — ${money(p.price * l.qty)}`
-  })
-  const text = ["Hi Rovar, I'd like to order:", ...rows, `Subtotal: ${money(subtotal)}`].join('\n')
-  return `${WHATSAPP}?text=${encodeURIComponent(text)}`
-}
-
 function Bag() {
-  const { lines, count, subtotal, setQty, bagOpen, setBagOpen } = useCart()
+  const { lines, count, subtotal, setQty, bagOpen, setBagOpen, setCheckoutOpen } = useCart()
   const close = () => setBagOpen(false)
+
   return (
     <Modal open={bagOpen} onClose={close} className="bag" label="Your bag">
       <div className="bag__inner">
         <header className="bag__head">
-          <h2>
-            Bag <sup>{count}</sup>
-          </h2>
+          <div className="bag__title-wrap">
+            <h2>
+              Bag <sup>{count}</sup>
+            </h2>
+            <span className="bag__shipping-badge">📦 COMPLIMENTARY WORLDWIDE DELIVERY</span>
+          </div>
           <button type="button" className="overlay__close" onClick={close} aria-label="Close bag">
             ×
           </button>
@@ -225,9 +234,9 @@ function Bag() {
 
         {lines.length === 0 ? (
           <div className="bag__empty">
-            <p>Your bag is empty.</p>
-            <a className="btn" href="#shop" onClick={close}>
-              Shop the range
+            <p>Your shopping bag is empty.</p>
+            <a className="btn btn--solid" href="#shop" onClick={close}>
+              Explore Collection
             </a>
           </div>
         ) : (
@@ -244,7 +253,11 @@ function Bag() {
                         {p.colour} · EU {l.size}
                       </p>
                       <div className="bag__row">
-                        <Qty value={l.qty} onChange={(q) => setQty(l.id, l.size, q)} label={`Quantity of ${p.name}, EU ${l.size}`} />
+                        <Qty
+                          value={l.qty}
+                          onChange={(q) => setQty(l.id, l.size, q)}
+                          label={`Quantity of ${p.name}, EU ${l.size}`}
+                        />
                         <button type="button" className="bag__remove" onClick={() => setQty(l.id, l.size, 0)}>
                           Remove
                         </button>
@@ -260,12 +273,21 @@ function Bag() {
                 <span>Subtotal</span>
                 <strong>{money(subtotal)}</strong>
               </div>
-              <p className="micro">Delivery calculated with your order. We confirm stock, sizing and delivery on WhatsApp.</p>
-              <a className="btn btn--solid" href={checkoutUrl(lines, subtotal)} target="_blank" rel="noreferrer">
-                Checkout
-              </a>
+              <p className="micro">
+                All duties &amp; express customs taxes included. Shipped in signature archival packaging.
+              </p>
+              <button
+                type="button"
+                className="btn btn--solid bag__checkout-btn"
+                onClick={() => {
+                  close()
+                  setCheckoutOpen(true)
+                }}
+              >
+                PROCEED TO CHECKOUT · {money(subtotal)}
+              </button>
               <button type="button" className="btn" onClick={close}>
-                Continue shopping
+                Continue Shopping
               </button>
             </footer>
           </>
@@ -279,26 +301,87 @@ function Bag() {
 export function BagButton() {
   const { count, setBagOpen } = useCart()
   return (
-    <button type="button" className="chrome__bag" onClick={() => setBagOpen(true)} aria-label={`Bag, ${count} item${count === 1 ? '' : 's'}`}>
-      BAG <span>{count}</span>
+    <button
+      type="button"
+      className={`chrome__bag ${count > 0 ? 'is-active' : ''}`}
+      onClick={() => setBagOpen(true)}
+      aria-label={`Bag, ${count} item${count === 1 ? '' : 's'}`}
+    >
+      <svg
+        className="chrome__btn-icon"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M2.5 5.5h11l-1 8.5h-9l-1-8.5z" />
+        <path d="M5.5 5.5v-2a2.5 2.5 0 0 1 5 0v2" />
+      </svg>
+      <span className="chrome__bag-label">BAG</span>
+      <span className="chrome__bag-count">{count}</span>
     </button>
   )
 }
 
-/** Product view + bag drawer; pauses smooth scroll while either is open. */
+/** Account pill in the fixed nav. */
+export function AccountButton() {
+  const { user, openAccount } = useAuth()
+  return (
+    <button
+      type="button"
+      className={`chrome__account ${user ? 'is-logged-in' : ''}`}
+      onClick={() => openAccount()}
+      aria-label="Account"
+    >
+      {user ? (
+        <>
+          <span className="account-dot" />
+          <span className="chrome__account-name">{user.name.split(' ')[0].toUpperCase()}</span>
+        </>
+      ) : (
+        <>
+          <svg
+            className="chrome__btn-icon"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="8" cy="5" r="3" />
+            <path d="M2.5 14a5.5 5.5 0 0 1 11 0" />
+          </svg>
+          <span className="chrome__account-label">SIGN IN</span>
+        </>
+      )}
+    </button>
+  )
+}
+
+/** Product view + bag drawer + checkout modal + account modal */
 export function ShopOverlays() {
-  const { bagOpen, viewing } = useCart()
+  const { bagOpen, viewing, checkoutOpen, setCheckoutOpen } = useCart()
+  const { accountOpen } = useAuth()
   const lenis = useLenis()
-  const open = bagOpen || !!viewing
+  const open = bagOpen || !!viewing || checkoutOpen || accountOpen
+
   useEffect(() => {
     if (!lenis || !open) return
     lenis.stop()
     return () => lenis.start()
   }, [lenis, open])
+
   return (
     <>
       <ProductView />
       <Bag />
+      <CheckoutModal open={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
+      <AccountModal />
     </>
   )
 }
